@@ -1,34 +1,59 @@
-import argparse
 import pandas as pd
-from sklearn.linear_model import ElasticNet
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error
 import mlflow
 import mlflow.sklearn
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+import joblib
+import os
+import shutil
 
-# Argument parser
-parser = argparse.ArgumentParser()
-parser.add_argument("--alpha", type=float, default=0.5)
-parser.add_argument("--l1_ratio", type=float, default=0.1)
-args = parser.parse_args()
+# 1. Konfigurasi Eksperimen
+mlflow.set_experiment("Workflow_CI_Royan")
 
-# Load dataset
-df = pd.read_csv("namadataset_preprocessing/data.csv")
-X = data.drop("target", axis=1)
-y = data["target"]
+# 2. Load Dataset (Pastikan path folder benar di repo Anda)
+dataset_path = os.path.join("namadataset_preprocessing", "data.csv")
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+if not os.path.exists(dataset_path):
+    raise FileNotFoundError(f"Dataset tidak ditemukan di: {dataset_path}")
 
-# MLflow run
+df = pd.read_csv(dataset_path)
+
+# 3. Preprocessing Dasar
+X = df.drop("target", axis=1)
+y = df["target"]
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# 4. Training & Tracking
 with mlflow.start_run():
-    model = ElasticNet(alpha=args.alpha, l1_ratio=args.l1_ratio)
+    # Model Parameter
+    n_estimators = 50
+    model = RandomForestClassifier(n_estimators=n_estimators, random_state=42)
     model.fit(X_train, y_train)
-    preds = model.predict(X_test)
-    rmse = mean_squared_error(y_test, preds, squared=False)
 
-    mlflow.log_param("alpha", args.alpha)
-    mlflow.log_param("l1_ratio", args.l1_ratio)
-    mlflow.log_metric("rmse", rmse)
-    mlflow.sklearn.log_model(model, "model")
+    # Evaluasi
+    predictions = model.predict(X_test)
+    acc = accuracy_score(y_test, predictions)
+    
+    # Log ke MLflow
+    mlflow.log_param("n_estimators", n_estimators)
+    mlflow.log_metric("accuracy", acc)
+    
+    # Simpan Model sebagai Artifact MLflow Resmi
+    mlflow.sklearn.log_model(model, "random_forest_model")
 
-    print(f"Run completed with RMSE: {rmse}")
+    # 5. Simpan Local Artifact (untuk workflow Docker/Drive Anda)
+    artifact_dir = "artifacts"
+    if os.path.exists(artifact_dir):
+        shutil.rmtree(artifact_dir) # Bersihkan folder lama
+    os.makedirs(artifact_dir, exist_ok=True)
+    
+    model_file = os.path.join(artifact_dir, "model.pkl")
+    joblib.dump(model, model_file)
+    mlflow.log_artifact(model_file)
+
+    print(f"✅ Training Selesai. Accuracy: {acc:.4f}")
+    print(f"📂 Model disimpan di: {model_file}")
