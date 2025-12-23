@@ -1,89 +1,60 @@
-name: MLflow CI
+name: MLOps CI/CD
 
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:
 
 jobs:
-  build:
+  mlops-task:
     runs-on: ubuntu-latest
-
     steps:
-    # 1️⃣ Set up job
-    - name: Set up job
-      run: echo "Starting MLflow CI job"
+      - name: Set up job
+        run: echo "Starting CI/CD Pipeline"
 
-    # 2️⃣ Run actions/checkout@v3
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Run actions/checkout@v3
+        uses: actions/checkout@v3
 
-    # 3️⃣ Set up Python 3.12.7
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12.7'
+      - name: Set up Python 3.12.7
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12.7'
 
-    # 4️⃣ Check Env
-    - name: Check Python Env
-      run: |
-        python --version
-        pip --version
+      - name: Check Env
+        run: |
+          python --version
+          ls -R
 
-    # 5️⃣ Install dependencies
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install mlflow==2.7.1 scikit-learn pandas numpy gdown  # gdown untuk Google Drive
+      - name: Install dependencies
+        run: |
+          pip install mlflow docker pandas scikit-learn
 
-    # 6️⃣ Run MLflow Project
-    - name: Run MLflow Project
-      run: mlflow run MLProject --experiment-name "Workflow-CI" -P alpha=0.5 -P l1_ratio=0.1 --no-conda
+      - name: Run mlflow project
+        run: |
+          cd MLProject
+          mlflow run . --experiment-name "Production_Training"
 
-    # 7️⃣ Get latest MLflow run_id
-    - name: Get latest MLflow run_id
-      id: get_run
-      run: |
-        RUN_ID=$(ls -td MLProject/mlruns/0/* | head -n1 | xargs -n1 basename)
-        echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+      - name: Get latest MLflow run_id
+        id: vars
+        run: |
+          # Mengambil Run ID terbaru untuk penamaan tag Docker
+          RUN_ID=$(ls mlruns/0 | grep -v "meta.yaml" | head -n 1)
+          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
 
-    # 8️⃣ Install Python dependencies (optional, jika artefak Python diperlukan)
-    - name: Install extra dependencies
-      run: pip install -r requirements.txt || echo "No extra dependencies"
+      - name: Build Docker Model
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/ml-model:latest ./MLProject
 
-    # 9️⃣ Upload to Google Drive
-    - name: Upload to Google Drive
-      run: |
-        # Contoh upload pakai gdown/gdrive CLI atau script Python
-        # gdrive upload MLProject/mlruns/$RUN_ID
-        echo "Upload placeholder - ganti sesuai metode upload"
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    # 🔟 Build Docker Model
-    - name: Build Docker Image
-      run: |
-        RUN_ID=${{ steps.get_run.outputs.run_id }}
-        mlflow models build-docker -m MLProject/mlruns/0/$RUN_ID/artifacts/model -n workflow-ci-image
+      - name: Tag Docker Image
+        run: |
+          docker tag ${{ secrets.DOCKER_USERNAME }}/ml-model:latest ${{ secrets.DOCKER_USERNAME }}/ml-model:${{ env.RUN_ID }}
 
-    # 1️⃣1️⃣ Log in to Docker Hub
-    - name: Docker Login
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    # 1️⃣2️⃣ Tag Docker Image
-    - name: Tag Docker Image
-      run: |
-        docker tag workflow-ci-image ${{ secrets.DOCKER_USERNAME }}/workflow-ci:latest
-
-    # 1️⃣3️⃣ Push Docker Image
-    - name: Push Docker Image
-      run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/workflow-ci:latest
-
-    # 1️⃣4️⃣ Post Log in to Docker Hub
-    - name: Post Docker Login
-      run: echo "Docker login completed"
-
-    # 1️⃣5️⃣ Post Set up Python 3.12.7
-    - nam
+      - name: Push Docker Image
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/ml-model:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/ml-model:${{ env.RUN_ID }}
