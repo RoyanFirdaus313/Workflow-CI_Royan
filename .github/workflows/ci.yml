@@ -10,45 +10,80 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    # 1️⃣ Checkout repository
+    # 1️⃣ Set up job
+    - name: Set up job
+      run: echo "Starting MLflow CI job"
+
+    # 2️⃣ Run actions/checkout@v3
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    # 2️⃣ Setup Python 3.11
+    # 3️⃣ Set up Python 3.12.7
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.12.7'
 
-    # 3️⃣ Install dependencies via pip
+    # 4️⃣ Check Env
+    - name: Check Python Env
+      run: |
+        python --version
+        pip --version
+
+    # 5️⃣ Install dependencies
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install mlflow scikit-learn pandas numpy
+        pip install mlflow==2.7.1 scikit-learn pandas numpy gdown  # gdown untuk Google Drive
 
-    # 4️⃣ Run MLflow Project via Python API (tanpa conda)
+    # 6️⃣ Run MLflow Project
     - name: Run MLflow Project
+      run: mlflow run MLProject --experiment-name "Workflow-CI" -P alpha=0.5 -P l1_ratio=0.1 --no-conda
+
+    # 7️⃣ Get latest MLflow run_id
+    - name: Get latest MLflow run_id
+      id: get_run
       run: |
-        python - <<EOF
-        import mlflow
-        mlflow.projects.run(
-            uri="MLProject",
-            experiment_name="Workflow-CI",
-            parameters={"alpha": 0.5, "l1_ratio": 0.1},
-            use_conda=False
-        )
-        EOF
+        RUN_ID=$(ls -td MLProject/mlruns/0/* | head -n1 | xargs -n1 basename)
+        echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
 
-    # 5️⃣ Upload model artefact ke GitHub (v4)
-    - name: Upload model artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: mlflow-model
-        path: MLProject/mlruns
+    # 8️⃣ Install Python dependencies (optional, jika artefak Python diperlukan)
+    - name: Install extra dependencies
+      run: pip install -r requirements.txt || echo "No extra dependencies"
 
-    # 6️⃣ Build Docker Image (Advance)
+    # 9️⃣ Upload to Google Drive
+    - name: Upload to Google Drive
+      run: |
+        # Contoh upload pakai gdown/gdrive CLI atau script Python
+        # gdrive upload MLProject/mlruns/$RUN_ID
+        echo "Upload placeholder - ganti sesuai metode upload"
+
+    # 🔟 Build Docker Model
     - name: Build Docker Image
-      if: ${{ github.ref == 'refs/heads/main' }}
       run: |
-        RUN_ID=$(ls -td MLProject/mlruns/0/* | head -n1)
-        mlflow models build-docker -m $RUN_ID/artifacts/model -n workflow-ci-image
+        RUN_ID=${{ steps.get_run.outputs.run_id }}
+        mlflow models build-docker -m MLProject/mlruns/0/$RUN_ID/artifacts/model -n workflow-ci-image
+
+    # 1️⃣1️⃣ Log in to Docker Hub
+    - name: Docker Login
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    # 1️⃣2️⃣ Tag Docker Image
+    - name: Tag Docker Image
+      run: |
+        docker tag workflow-ci-image ${{ secrets.DOCKER_USERNAME }}/workflow-ci:latest
+
+    # 1️⃣3️⃣ Push Docker Image
+    - name: Push Docker Image
+      run: |
+        docker push ${{ secrets.DOCKER_USERNAME }}/workflow-ci:latest
+
+    # 1️⃣4️⃣ Post Log in to Docker Hub
+    - name: Post Docker Login
+      run: echo "Docker login completed"
+
+    # 1️⃣5️⃣ Post Set up Python 3.12.7
+    - nam
