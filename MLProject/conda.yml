@@ -1,7 +1,6 @@
-name: model_env
+name: workflow-ci-env
 channels:
   - defaults
-  - conda-forge
 dependencies:
   - python=3.9
   - pip
@@ -9,5 +8,3 @@ dependencies:
       - mlflow
       - scikit-learn
       - pandas
-      - numpy
-      - boto3  # Jika menggunakan DagsHub/S3
