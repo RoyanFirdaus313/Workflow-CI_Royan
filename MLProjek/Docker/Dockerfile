@@ -1,17 +1,19 @@
-# Gunakan base image Python
-FROM python:3.11-slim
+# Gunakan base image Miniconda3
+FROM continuumio/miniconda3:latest
 
 # Set working directory di container
 WORKDIR /app
 
-# Salin seluruh isi folder build context (MLProjek) ke container
+# Salin semua isi folder MLProjek ke container
 COPY . /app
 
-# Install dependencies pip
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Buat environment conda dari conda.yml
+RUN conda env create -f conda.yml
 
+# Aktifkan environment conda secara default
+SHELL ["conda", "run", "-n", "sml-env", "/bin/bash", "-c"]
 
 # Default command saat container dijalankan
 CMD ["python", "modelling.py"]
+
 
