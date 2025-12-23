@@ -1,11 +1,13 @@
-name: sml-env
+name: model_env
 channels:
   - defaults
+  - conda-forge
 dependencies:
-  - python=3.11
+  - python=3.9
   - pip
-  - pandas
-  - numpy
-  - scikit-learn
-  - mlflow
-  - matplotlib
+  - pip:
+      - mlflow
+      - scikit-learn
+      - pandas
+      - numpy
+      - boto3  # Jika menggunakan DagsHub/S3
