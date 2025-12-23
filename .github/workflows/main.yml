@@ -1,5 +1,0 @@
-- name: Run mlflow project
-        run: |
-          cd MLProject
-          # Tambahkan flag --env-manager local
-          mlflow run . --experiment-name "Workflow_CI_Royan" --env-manager local
