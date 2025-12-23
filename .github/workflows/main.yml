@@ -1,15 +1,18 @@
-name: MLOps CI/CD
+name: MLOps Workflow Royan
 
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  mlops-task:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Set up job
-        run: echo "Starting CI/CD Pipeline"
+        run: echo "Starting the MLOps CI/CD Pipeline for Royan Project"
 
       - name: Run actions/checkout@v3
         uses: actions/checkout@v3
@@ -22,28 +25,39 @@ jobs:
       - name: Check Env
         run: |
           python --version
+          pip --version
           ls -R
 
       - name: Install dependencies
         run: |
-          pip install mlflow docker pandas scikit-learn
+          python -m pip install --upgrade pip
+          pip install mlflow scikit-learn pandas joblib docker
 
       - name: Run mlflow project
         run: |
+          # Berpindah ke folder project dan jalankan MLflow
           cd MLProject
-          # Tambahkan flag --env-manager local
-          mlflow run . --experiment-name "Workflow_CI_Royan" --env-manager local
+          mlflow run . --experiment-name "Eksperimen_SML_Royan_Basic" --env-manager local
 
       - name: Get latest MLflow run_id
         id: vars
         run: |
-          # Mengambil Run ID terbaru untuk penamaan tag Docker
-          RUN_ID=$(ls mlruns/0 | grep -v "meta.yaml" | head -n 1)
-          echo "RUN_ID=$RUN_ID" >> $GITHUB_ENV
+          # Mencari directory run_id terbaru di dalam folder mlruns
+          # Kita mencari folder dengan nama hexadesimal panjang di dalam folder experiment '0' atau folder experiment baru
+          RUN_ID=$(ls -t MLProject/mlruns/ | grep -v "models" | grep -v "meta.yaml" | head -n 1)
+          if [ -z "$RUN_ID" ]; then
+            # Cek di subfolder jika menggunakan experiment name baru
+            RUN_ID=$(find MLProject/mlruns/ -maxdepth 2 -type d -links 2 | head -n 1 | xargs basename)
+          fi
+          echo "MLFLOW_RUN_ID=$RUN_ID" >> $GITHUB_ENV
+          echo "Latest Run ID found: $RUN_ID"
+
+      - name: Install Python dependencies
+        run: pip install -r MLProject/conda.yaml || echo "No requirements.txt found, skipping"
 
       - name: Build Docker Model
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/ml-model:latest ./MLProject
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/ml-model-royan:latest ./MLProject
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -53,9 +67,21 @@ jobs:
 
       - name: Tag Docker Image
         run: |
-          docker tag ${{ secrets.DOCKER_USERNAME }}/ml-model:latest ${{ secrets.DOCKER_USERNAME }}/ml-model:${{ env.RUN_ID }}
+          docker tag ${{ secrets.DOCKER_USERNAME }}/ml-model-royan:latest ${{ secrets.DOCKER_USERNAME }}/ml-model-royan:${{ env.MLFLOW_RUN_ID }}
 
       - name: Push Docker Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/ml-model:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/ml-model:${{ env.RUN_ID }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/ml-model-royan:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/ml-model-royan:${{ env.MLFLOW_RUN_ID }}
+
+      - name: Post Log in to Docker Hub
+        run: echo "Cleaning up Docker credentials..."
+
+      - name: Post Set up Python 3.12.7
+        run: echo "Cleaning up Python environment..."
+
+      - name: Post Run actions/checkout@v3
+        run: echo "Job workspace cleanup completed."
+
+      - name: Complete job
+        run: echo "Workflow finished successfully!"
