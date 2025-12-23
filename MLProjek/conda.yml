@@ -1,11 +1,11 @@
 name: sml-env
 channels:
-  - conda-forge
+  - defaults
 dependencies:
-  - python=3.9
+  - python=3.11
   - pip
-  - pip:
-      - mlflow
-      - scikit-learn
-      - pandas
-      - joblib
+  - pandas
+  - numpy
+  - scikit-learn
+  - mlflow
+  - matplotlib
