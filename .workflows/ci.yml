@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:  # Bisa manual trigger
+  workflow_dispatch:
 
 jobs:
   train_and_docker:
@@ -21,18 +21,18 @@ jobs:
         with:
           python-version: '3.11'
 
-      # 3️⃣ Install dependencies
+      # 3️⃣ Install dependencies for MLflow
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          pip install mlflow pandas numpy scikit-learn
+          pip install mlflow pandas numpy scikit-learn matplotlib
 
-      # 4️⃣ Run model training via MLflow
+      # 4️⃣ Run MLflow training
       - name: Train ML model
         run: |
           mlflow run MLProject -P some_param=123
 
-      # 5️⃣ Upload MLflow artefacts (model) ke repository
+      # 5️⃣ Upload MLflow artefacts
       - name: Upload model artefact
         uses: actions/upload-artifact@v3
         with:
@@ -44,7 +44,7 @@ jobs:
         run: |
           docker build -t royanfirdaus313/workflow-ci_royan:latest -f MLProject/Docker/Dockerfile MLProject
 
-      # 7️⃣ Login to Docker Hub
+      # 7️⃣ Login Docker Hub
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -55,4 +55,3 @@ jobs:
       - name: Push Docker image
         run: |
           docker push royanfirdaus313/workflow-ci_royan:latest
-
