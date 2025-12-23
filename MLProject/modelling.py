@@ -11,7 +11,7 @@ mlflow.set_experiment("Eksperimen_SML_Royan_Basic")
 
 # Pastikan path dataset relatif terhadap lokasi script
 base_dir = os.path.dirname(__file__)
-data_path = os.path.join(base_dir, "namadataset_preprocessing", "cleaned_df.csv")
+data_path = os.path.join(base_dir, "namadataset_preprocessing", "data.csv")
 
 # 2. Load data
 if not os.path.exists(data_path):
