@@ -1,16 +1,16 @@
 # Gunakan base image Python
 FROM python:3.11-slim
 
-# Set working directory
+# Set working directory di container
 WORKDIR /app
 
-# Salin semua isi MLProjek ke container
+# Salin seluruh isi folder build context (MLProjek) ke container
 COPY . /app
 
 # Install dependencies
 RUN pip install --upgrade pip
-# Jika menggunakan conda.yaml
-RUN pip install -r conda.yaml
+RUN pip install -r conda.yml  # pastikan conda.yml ada di MLProjek
 
-# Jalankan script default
+# Default command saat container dijalankan
 CMD ["python", "modelling.py"]
+
