@@ -7,9 +7,10 @@ WORKDIR /app
 # Salin seluruh isi folder build context (MLProjek) ke container
 COPY . /app
 
-# Install dependencies
+# Install dependencies pip
 RUN pip install --upgrade pip
-RUN pip install -r conda.yml  # pastikan conda.yml ada di MLProjek
+RUN pip install -r requirements.txt
+
 
 # Default command saat container dijalankan
 CMD ["python", "modelling.py"]
