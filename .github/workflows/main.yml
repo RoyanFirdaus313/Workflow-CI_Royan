@@ -31,7 +31,8 @@ jobs:
       - name: Run mlflow project
         run: |
           cd MLProject
-          mlflow run . --experiment-name "Production_Training"
+          # Tambahkan flag --env-manager local
+          mlflow run . --experiment-name "Workflow_CI_Royan" --env-manager local
 
       - name: Get latest MLflow run_id
         id: vars
