@@ -13,7 +13,7 @@ parser.add_argument("--l1_ratio", type=float, default=0.1)
 args = parser.parse_args()
 
 # Load dataset
-df = pd.read_csv("namadataset_preprocessing/cleaned_df.csv")
+df = pd.read_csv("namadataset_preprocessing/data.csv")
 X = data.drop("target", axis=1)
 y = data["target"]
 
