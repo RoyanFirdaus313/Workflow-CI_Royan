@@ -10,24 +10,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # 1️⃣ Checkout repository
     - name: Checkout repository
       uses: actions/checkout@v3
 
+    # 2️⃣ Setup Python 3.11
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'   # perbaikan di sini
+        python-version: '3.11'
 
+    # 3️⃣ Install dependencies via pip
     - name: Install dependencies
       run: |
-        pip install --upgrade pip
+        python -m pip install --upgrade pip
         pip install mlflow scikit-learn pandas numpy
 
+    # 4️⃣ Run MLflow Project tanpa conda
     - name: Run MLflow Project
-      run: mlflow run MLProject --experiment-name "Workflow-CI" -P alpha=0.5 -P l1_ratio=0.1
+      run: mlflow run MLProject --experiment-name "Workflow-CI" -P alpha=0.5 -P l1_ratio=0.1 --no-conda
 
+    # 5️⃣ Upload model artefact ke GitHub (v4)
     - name: Upload model artifact
       uses: actions/upload-artifact@v4
       with:
         name: mlflow-model
         path: MLProject/mlruns
+
+    # 6️⃣ Build Docker Image (Advance)
+    - name: Build Docker Image
+      if: ${{ github.ref == 'refs/heads/main' }}
+      run: |
+        # Ambil run ID terakhir
+        RUN_ID=$(ls -td MLProject/mlruns/0/* | head -n1)
+        mlflow models build-docker -m $RUN_ID/artifacts/model -n workflow-ci-image
