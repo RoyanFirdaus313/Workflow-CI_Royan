@@ -1,0 +1,60 @@
+digest: 8d1439c5
+name: dataset
+profile: '{"num_rows": 12207, "num_elements": 793455}'
+schema: '{"mlflow_colspec": [{"type": "double", "name": "usia", "required": true},
+  {"type": "double", "name": "jumlah_kontak_kampanye_ini", "required": true}, {"type":
+  "double", "name": "hari_sejak_kontak_sebelumnya", "required": true}, {"type": "double",
+  "name": "jumlah_kontak_sebelumnya", "required": true}, {"type": "double", "name":
+  "tingkat_variasi_pekerjaan", "required": true}, {"type": "double", "name": "indeks_harga_konsumen",
+  "required": true}, {"type": "double", "name": "indeks_kepercayaan_konsumen", "required":
+  true}, {"type": "double", "name": "suku_bunga_euribor_3bln", "required": true},
+  {"type": "double", "name": "jumlah_pekerja", "required": true}, {"type": "double",
+  "name": "pekerjaan_entrepreneur", "required": true}, {"type": "double", "name":
+  "pekerjaan_mahasiswa", "required": true}, {"type": "double", "name": "pekerjaan_manajer",
+  "required": true}, {"type": "double", "name": "pekerjaan_pekerja kasar", "required":
+  true}, {"type": "double", "name": "pekerjaan_pemilik bisnis", "required": true},
+  {"type": "double", "name": "pekerjaan_pengangguran", "required": true}, {"type":
+  "double", "name": "pekerjaan_pensiunan", "required": true}, {"type": "double", "name":
+  "pekerjaan_penyedia jasa", "required": true}, {"type": "double", "name": "pekerjaan_sosial
+  media specialis", "required": true}, {"type": "double", "name": "pekerjaan_teknisi",
+  "required": true}, {"type": "double", "name": "status_perkawinan_lajang", "required":
+  true}, {"type": "double", "name": "status_perkawinan_menikah", "required": true},
+  {"type": "double", "name": "pendidikan_Pendidikan Tinggi", "required": true}, {"type":
+  "double", "name": "pendidikan_SD", "required": true}, {"type": "double", "name":
+  "pendidikan_SMA", "required": true}, {"type": "double", "name": "pendidikan_SMP",
+  "required": true}, {"type": "double", "name": "pendidikan_TIDAK SEKOLAH", "required":
+  true}, {"type": "double", "name": "pendidikan_Tidak Tamat SD", "required": true},
+  {"type": "double", "name": "gagal_bayar_sebelumnya_yes", "required": true}, {"type":
+  "double", "name": "pinjaman_rumah_yes", "required": true}, {"type": "double", "name":
+  "pinjaman_pribadi_yes", "required": true}, {"type": "double", "name": "jenis_kontak_telephone",
+  "required": true}, {"type": "double", "name": "bulan_kontak_terakhir_aug", "required":
+  true}, {"type": "double", "name": "bulan_kontak_terakhir_dec", "required": true},
+  {"type": "double", "name": "bulan_kontak_terakhir_jul", "required": true}, {"type":
+  "double", "name": "bulan_kontak_terakhir_jun", "required": true}, {"type": "double",
+  "name": "bulan_kontak_terakhir_mar", "required": true}, {"type": "double", "name":
+  "bulan_kontak_terakhir_may", "required": true}, {"type": "double", "name": "bulan_kontak_terakhir_nov",
+  "required": true}, {"type": "double", "name": "bulan_kontak_terakhir_oct", "required":
+  true}, {"type": "double", "name": "bulan_kontak_terakhir_sep", "required": true},
+  {"type": "double", "name": "hari_kontak_terakhir_mon", "required": true}, {"type":
+  "double", "name": "hari_kontak_terakhir_thu", "required": true}, {"type": "double",
+  "name": "hari_kontak_terakhir_tue", "required": true}, {"type": "double", "name":
+  "hari_kontak_terakhir_wed", "required": true}, {"type": "double", "name": "hasil_kampanye_sebelumnya_nonexistent",
+  "required": true}, {"type": "double", "name": "hasil_kampanye_sebelumnya_success",
+  "required": true}, {"type": "double", "name": "pulau_Jawa", "required": true}, {"type":
+  "double", "name": "pulau_Kalimantan", "required": true}, {"type": "double", "name":
+  "pulau_NTB", "required": true}, {"type": "double", "name": "pulau_NTT", "required":
+  true}, {"type": "double", "name": "pulau_Papua", "required": true}, {"type": "double",
+  "name": "pulau_Sulawesi", "required": true}, {"type": "double", "name": "pulau_Sumatera",
+  "required": true}, {"type": "double", "name": "usia_bin_dewasa", "required": true},
+  {"type": "double", "name": "usia_bin_paruh_baya", "required": true}, {"type": "double",
+  "name": "usia_bin_lansia", "required": true}, {"type": "double", "name": "usia_bin_dewasa.1",
+  "required": true}, {"type": "double", "name": "usia_bin_paruh_baya.1", "required":
+  true}, {"type": "double", "name": "usia_bin_lansia.1", "required": true}, {"type":
+  "double", "name": "usia_bin_dewasa.2", "required": true}, {"type": "double", "name":
+  "usia_bin_paruh_baya.2", "required": true}, {"type": "double", "name": "usia_bin_lansia.2",
+  "required": true}, {"type": "boolean", "name": "usia_bin_dewasa.3", "required":
+  true}, {"type": "boolean", "name": "usia_bin_paruh_baya.3", "required": true}, {"type":
+  "boolean", "name": "usia_bin_lansia.3", "required": true}]}'
+source: '{"tags": {"mlflow.user": "ACER", "mlflow.source.name": "modelling.py", "mlflow.source.type":
+  "LOCAL", "mlflow.source.git.commit": "2b0ec0eeef0f33b15735d86edc4a75eea344725d"}}'
+source_type: code

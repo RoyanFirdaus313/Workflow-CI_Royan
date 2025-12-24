@@ -1,0 +1,15 @@
+artifact_uri: file:///D:/Workflow-CI_Royan/MLProject/mlruns/0/d3ae1560b99e49d886109b9c31fd62c2/artifacts
+end_time: 1766544542502
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: d3ae1560b99e49d886109b9c31fd62c2
+run_name: big-fawn-74
+run_uuid: d3ae1560b99e49d886109b9c31fd62c2
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1766544498279
+status: 3
+tags: []
+user_id: ACER
